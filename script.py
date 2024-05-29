@@ -1,28 +1,18 @@
 import json
 import argparse
-import os
 
-def load_json(file_path):
+def save_to_json(data, file_path):
     """
-    Load JSON data from a file and validate its syntax.
+    Save data to a JSON file.
     
+    :param data: Data to be saved
     :param file_path: Path to the JSON file
-    :return: Parsed JSON object
-    :raises: ValueError if JSON syntax is invalid
     """
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"The file {file_path} does not exist.")
-    
-    with open(file_path, 'r', encoding='utf-8') as file:
-        try:
-            data = json.load(file)
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON syntax in file {file_path}: {e}")
-    
-    return data
+    with open(file_path, 'w', encoding='utf-8') as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
 
 def main():
-    parser = argparse.ArgumentParser(description="Load and validate JSON file.")
+    parser = argparse.ArgumentParser(description="Save data to a JSON file.")
     
     
     parser.add_argument(
@@ -33,12 +23,16 @@ def main():
     
     args = parser.parse_args()
     
-    try:
-        data = load_json(args.file)
-        print("JSON file loaded and validated successfully.")
-        print(data)
-    except (FileNotFoundError, ValueError) as e:
-        print(e)
+    
+    data = {
+        "name": "Jane Doe",
+        "age": 25,
+        "is_student": True,
+        "courses": ["Physics", "Chemistry"]
+    }
+    
+    save_to_json(data, args.file)
+    print(f"Data has been saved to {args.file}.")
 
 if __name__ == "__main__":
     main()
