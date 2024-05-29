@@ -1,40 +1,46 @@
-import yaml
+import xml.etree.ElementTree as ET
 import argparse
+import os
 
-def save_to_yaml(data, file_path):
+def load_xml(file_path):
     """
-    Save data to a YAML file.
+    Load XML data from a file and validate its syntax.
     
-    :param data: Data to be saved
-    :param file_path: Path to the YAML file
+    :param file_path: Path to the XML file
+    :return: Parsed XML object (ElementTree)
+    :raises: ValueError if XML syntax is invalid
     """
-    with open(file_path, 'w', encoding='utf-8') as file:
-        yaml.dump(data, file, default_flow_style=False, allow_unicode=True)
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
+    
+    try:
+        tree = ET.parse(file_path)
+        return tree
+    except ET.ParseError as e:
+        raise ValueError(f"Invalid XML syntax in file {file_path}: {e}")
 
 def main():
-    parser = argparse.ArgumentParser(description="Save data to a YAML file.")
+    parser = argparse.ArgumentParser(description="Load and validate XML file.")
     
     
     parser.add_argument(
         '-f', '--file', 
         required=True, 
-        help='Path to the YAML file'
+        help='Path to the XML file'
     )
     
     args = parser.parse_args()
     
-    
-    data = {
-        "name": "Jane Doe",
-        "age": 25,
-        "is_student": True,
-        "courses": ["Physics", "Chemistry"]
-    }
-    
-    save_to_yaml(data, args.file)
-    print(f"Data has been saved to {args.file}.")
+    try:
+        tree = load_xml(args.file)
+        print("XML file loaded and validated successfully.")
+        root = tree.getroot()
+        print(ET.tostring(root, encoding='utf-8').decode('utf-8'))
+    except (FileNotFoundError, ValueError) as e:
+        print(e)
 
 if __name__ == "__main__":
     main()
+
 
 
