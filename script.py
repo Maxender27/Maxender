@@ -1,26 +1,34 @@
 import xml.etree.ElementTree as ET
 import argparse
-import os
 
-def load_xml(file_path):
+def save_to_xml(data, file_path):
     """
-    Load XML data from a file and validate its syntax.
+    Save data to an XML file.
     
+    :param data: Data to be saved (dictionary)
     :param file_path: Path to the XML file
-    :return: Parsed XML object (ElementTree)
-    :raises: ValueError if XML syntax is invalid
     """
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"The file {file_path} does not exist.")
+    person = ET.Element("person")
     
-    try:
-        tree = ET.parse(file_path)
-        return tree
-    except ET.ParseError as e:
-        raise ValueError(f"Invalid XML syntax in file {file_path}: {e}")
+    name = ET.SubElement(person, "name")
+    name.text = data.get("name", "")
+    
+    age = ET.SubElement(person, "age")
+    age.text = str(data.get("age", ""))
+    
+    is_student = ET.SubElement(person, "is_student")
+    is_student.text = str(data.get("is_student", ""))
+    
+    courses = ET.SubElement(person, "courses")
+    for course in data.get("courses", []):
+        course_element = ET.SubElement(courses, "course")
+        course_element.text = course
+    
+    tree = ET.ElementTree(person)
+    tree.write(file_path, encoding='utf-8', xml_declaration=True)
 
 def main():
-    parser = argparse.ArgumentParser(description="Load and validate XML file.")
+    parser = argparse.ArgumentParser(description="Save data to an XML file.")
     
     
     parser.add_argument(
@@ -31,13 +39,16 @@ def main():
     
     args = parser.parse_args()
     
-    try:
-        tree = load_xml(args.file)
-        print("XML file loaded and validated successfully.")
-        root = tree.getroot()
-        print(ET.tostring(root, encoding='utf-8').decode('utf-8'))
-    except (FileNotFoundError, ValueError) as e:
-        print(e)
+    
+    data = {
+        "name": "Jane Doe",
+        "age": 25,
+        "is_student": True,
+        "courses": ["Physics", "Chemistry"]
+    }
+    
+    save_to_xml(data, args.file)
+    print(f"Data has been saved to {args.file}.")
 
 if __name__ == "__main__":
     main()
