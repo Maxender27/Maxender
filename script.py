@@ -1,28 +1,18 @@
 import yaml
 import argparse
-import os
 
-def load_yaml(file_path):
+def save_to_yaml(data, file_path):
     """
-    Load YAML data from a file and validate its syntax.
+    Save data to a YAML file.
     
+    :param data: Data to be saved
     :param file_path: Path to the YAML file
-    :return: Parsed YAML object
-    :raises: ValueError if YAML syntax is invalid
     """
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"The file {file_path} does not exist.")
-    
-    with open(file_path, 'r', encoding='utf-8') as file:
-        try:
-            data = yaml.safe_load(file)
-        except yaml.YAMLError as e:
-            raise ValueError(f"Invalid YAML syntax in file {file_path}: {e}")
-    
-    return data
+    with open(file_path, 'w', encoding='utf-8') as file:
+        yaml.dump(data, file, default_flow_style=False, allow_unicode=True)
 
 def main():
-    parser = argparse.ArgumentParser(description="Load and validate YAML file.")
+    parser = argparse.ArgumentParser(description="Save data to a YAML file.")
     
     
     parser.add_argument(
@@ -33,12 +23,16 @@ def main():
     
     args = parser.parse_args()
     
-    try:
-        data = load_yaml(args.file)
-        print("YAML file loaded and validated successfully.")
-        print(data)
-    except (FileNotFoundError, ValueError) as e:
-        print(e)
+    
+    data = {
+        "name": "Jane Doe",
+        "age": 25,
+        "is_student": True,
+        "courses": ["Physics", "Chemistry"]
+    }
+    
+    save_to_yaml(data, args.file)
+    print(f"Data has been saved to {args.file}.")
 
 if __name__ == "__main__":
     main()
